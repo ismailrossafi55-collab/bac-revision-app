@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0F172A">
+    <meta name="description" content="تطبيق مراجعة البكالوريا بنظام التدكر المتباعد">
+    <title>🎓 تطبيق مراجعتي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0F172A;
+            --gold: #F59E0B;
+            --text-light: #f3f4f6;
+            --text-dark: #1f2937;
+            --danger: #ef4444;
+            --success: #10b981;
+            --warning: #f97316;
+            --border: #e5e7eb;
+            --bg-light: #ffffff;
+            --bg-dark: #1a202c;
+        }
+
+        body.dark-mode {
+            --text-light: #1f2937;
+            --text-dark: #f3f4f6;
+            --border: #374151;
+            --bg-light: #1a202c;
+            --bg-dark: #ffffff;
+        }
+
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            transition: 0.3s;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 430px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, #1e293b 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .dark-toggle {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: 0.3s;
+        }
+
+        .dark-toggle:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .content {
+            min-height: calc(100vh - 200px);
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            transition: 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 12px;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .card-badge {
+            background: var(--gold);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .card-subject {
+            font-size: 0.9em;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .card-level {
+            display: inline-block;
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--gold);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), #fbbf24);
+            transition: width 0.3s;
+        }
+
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        button {
+            padding: 10px 12px;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+            font-size: 0.9em;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-easy {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-easy:hover {
+            opacity: 0.9;
+        }
+
+        .btn-medium {
+            background: var(--warning);
+            color: white;
+        }
+
+        .btn-medium:hover {
+            opacity: 0.9;
+        }
+
+        .btn-hard {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-hard:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+        }
+
+        .btn-primary:hover {
+            background: #1e293b;
+        }
+
+        .btn-delete {
+            background: var(--danger);
+            color: white;
+            padding: 8px 12px;
+            font-size: 0.85em;
+            flex: 1;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            font-size: 1em;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+        }
+
+        .stat-box {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: 900;
+            color: var(--gold);
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #6b7280;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-dark);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            max-width: 430px;
+            margin: 0 auto;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+        }
+
+        .nav-item {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: none;
+            background: none;
+            font-family: 'Tajawal', sans-serif;
+            color: #9ca3af;
+            font-weight: 600;
+        }
+
+        .nav-item.active {
+            color: var(--gold);
+            border-top: 3px solid var(--gold);
+        }
+
+        .nav-icon {
+            font-size: 1.5em;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .nav-label {
+            font-size: 0.75em;
+        }
+
+        .subject-group {
+            margin-bottom: 24px;
+        }
+
+        .subject-group-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 16px 0 12px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--gold);
+        }
+
+        .lesson-card {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .lesson-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .lesson-actions button {
+            flex: 1;
+            padding: 8px;
+        }
+
+        .status-due {
+            background: var(--danger);
+        }
+
+        .status-upcoming {
+            background: var(--success);
+        }
+
+        .status-completed {
+            background: var(--gold);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-controls">
+                <button class="dark-toggle" onclick="toggleDarkMode()">🌙</button>
+            </div>
+            <h1>🎓 مراجعتي</h1>
+            <p class="subtitle">تطبيق البكالوريا الذكي</p>
+        </header>
+
+        <div class="content">
+            <!-- PAGE 1: TODAY -->
+            <div id="today-page" class="page active">
+                <div id="today-container"></div>
+            </div>
+
+            <!-- PAGE 2: ADD LESSON -->
+            <div id="add-page" class="page">
+                <div class="form-group">
+                    <label>📝 اسم الدرس</label>
+                    <input type="text" id="lesson-name" placeholder="مثال: النسبة المئوية">
+                </div>
+
+                <div class="form-group">
+                    <label>📚 المادة</label>
+                    <select id="lesson-subject">
+                        <option value="SVT">العلوم الطبيعية (SVT)</option>
+                        <option value="Physique-Chimie">الفيزياء والكيمياء</option>
+                        <option value="Mathématiques">الرياضيات</option>
+                        <option value="Français">اللغة الفرنسية</option>
+                        <option value="Arabe">اللغة العربية</option>
+                        <option value="Histoire-Géo">التاريخ والجغرافيا</option>
+                        <option value="Philosophie">الفلسفة</option>
+                        <option value="Anglais">اللغة الإنجليزية</option>
+                        <option value="Islam">الدراسات الإسلامية</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>📌 ملاحظات (اختياري)</label>
+                    <textarea id="lesson-note" placeholder="أضف ملاحظاتك هنا..."></textarea>
+                </div>
+
+                <button class="btn-primary" onclick="addLesson()">➕ إضافة الدرس</button>
+            </div>
+
+            <!-- PAGE 3: ALL LESSONS -->
+            <div id="lessons-page" class="page">
+                <div id="lessons-container"></div>
+            </div>
+
+            <!-- PAGE 4: STATS -->
+            <div id="stats-page" class="page">
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number" id="total-lessons">0</div>
+                        <div class="stat-label">إجمالي الدروس</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="reviews-week">0</div>
+                        <div class="stat-label">مراجعات هذا الأسبوع</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="mastered">0</div>
+                        <div class="stat-label">دروس متقنة</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number" id="streak">0</div>
+                        <div class="stat-label">أيام متتالية</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <nav class="nav-bar">
+            <button class="nav-item active" onclick="switchPage('today')">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">اليوم</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('add')">
+                <span class="nav-icon">➕</span>
+                <span class="nav-label">إضافة</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('lessons')">
+                <span class="nav-icon">📚</span>
+                <span class="nav-label">دروسي</span>
+            </button>
+            <button class="nav-item" onclick="switchPage('stats')">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">إحصائيات</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        let lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        let reviews = JSON.parse(localStorage.getItem('reviews')) || [];
+
+        function switchPage(page) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+            const pageMap = { 'today': 0, 'add': 1, 'lessons': 2, 'stats': 3 };
+            const pageIndex = pageMap[page];
+            
+            document.querySelectorAll('.page')[pageIndex]?.classList.add('active');
+            document.querySelectorAll('.nav-item')[pageIndex]?.classList.add('active');
+
+            if (page === 'today') renderTodayPage();
+            else if (page === 'lessons') renderLessonsPage();
+            else if (page === 'stats') renderStatsPage();
+        }
+
+        function addLesson() {
+            const name = document.getElementById('lesson-name').value;
+            const subject = document.getElementById('lesson-subject').value;
+            const note = document.getElementById('lesson-note').value;
+
+            if (!name.trim()) {
+                alert('⚠️ الرجاء إدخال اسم الدرس');
+                return;
+            }
+
+            const lesson = {
+                id: Date.now(),
+                name,
+                subject,
+                note,
+                createdAt: new Date().toISOString(),
+                level: 0
+            };
+
+            lessons.push(lesson);
+            saveLessons();
+            scheduleReview(lesson.id, 1);
+
+            document.getElementById('lesson-name').value = '';
+            document.getElementById('lesson-note').value = '';
+
+            alert('✅ تم إضافة الدرس بنجاح!');
+            switchPage('today');
+        }
+
+        function scheduleReview(lessonId, interval) {
+            const dueDate = new Date();
+            
+            if (interval === 1) dueDate.setDate(dueDate.getDate() + 1);
+            else if (interval === 2) dueDate.setDate(dueDate.getDate() + 7);
+            else if (interval === 3) dueDate.setDate(dueDate.getDate() + 15);
+            else if (interval === 4) dueDate.setDate(dueDate.getDate() + 30);
+
+            const review = {
+                id: Date.now(),
+                lessonId,
+                dueDate: dueDate.toISOString().split('T')[0],
+                interval,
+                completed: false
+            };
+
+            reviews.push(review);
+            saveReviews();
+        }
+
+        function renderTodayPage() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayReviews = reviews.filter(r => r.dueDate === today && !r.completed);
+
+            let html = '';
+
+            if (todayReviews.length === 0) {
+                html = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">✅</div>
+                        <div class="empty-state-title">رائع!</div>
+                        <p>لا توجد دروس للمراجعة اليوم</p>
+                    </div>
+                `;
+            } else {
+                const completed = reviews.filter(r => r.dueDate === today && r.completed).length;
+                const total = todayReviews.length + completed;
+                const percentage = Math.round((completed / total) * 100);
+
+                html = `
+                    <div class="card">
+                        <div style="text-align: center; margin-bottom: 16px;">
+                            <div style="font-size: 2.5em; margin-bottom: 8px;">📚</div>
+                            <div style="font-size: 1.1em; font-weight: 700; margin-bottom: 4px;">${completed} من ${total}</div>
+                            <div style="color: #6b7280; font-size: 0.9em;">تم إنجازه اليوم</div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${percentage}%"></div>
+                        </div>
+                    </div>
+                `;
+
+                todayReviews.forEach(review => {
+                    const lesson = lessons.find(l => l.id === review.lessonId);
+                    
+                    html += `
+                        <div class="card">
+                            <div class="card-header">
+                                <div>
+                                    <div class="card-title">${lesson.name}</div>
+                                    <div class="card-subject">${lesson.subject}</div>
+                                </div>
+                                <span class="card-level">المستوى ${review.interval}</span>
+                            </div>
+                            <div class="button-group">
+                                <button class="btn-easy" onclick="rateReview(${review.id}, 'easy')">سهل ✅</button>
+                                <button class="btn-medium" onclick="rateReview(${review.id}, 'medium')">متوسط ⚡</button>
+                                <button class="btn-hard" onclick="rateReview(${review.id}, 'hard')">صعب ❌</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('today-container').innerHTML = html;
+        }
+
+        function rateReview(reviewId, rating) {
+            const review = reviews.find(r => r.id === reviewId);
+            const lesson = lessons.find(l => l.id === review.lessonId);
+
+            review.completed = true;
+            review.completedAt = new Date().toISOString();
+            review.rating = rating;
+
+            if (rating === 'easy') {
+                if (review.interval < 4) {
+                    scheduleReview(lesson.id, review.interval + 1);
+                    lesson.level = review.interval + 1;
+                }
+            } else if (rating === 'medium') {
+                scheduleReview(lesson.id, review.interval);
+            } else if (rating === 'hard') {
+                scheduleReview(lesson.id, 1);
+                lesson.level = Math.max(0, lesson.level - 1);
+            }
+
+            saveLessons();
+            saveReviews();
+            renderTodayPage();
+        }
+
+        function renderLessonsPage() {
+            let html = '';
+
+            if (lessons.length === 0) {
+                html = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📚</div>
+                        <div class="empty-state-title">لا توجد دروس</div>
+                        <p>ابدأ بإضافة درسك الأول</p>
+                    </div>
+                `;
+            } else {
+                const subjects = [...new Set(lessons.map(l => l.subject))];
+                
+                subjects.forEach(subject => {
+                    const subjectLessons = lessons.filter(l => l.subject === subject);
+                    html += `<div class="subject-group"><div class="subject-group-title">${subject}</div>`;
+
+                    subjectLessons.forEach(lesson => {
+                        const nextReview = reviews.find(r => r.lessonId === lesson.id && !r.completed);
+                        const nextDate = nextReview ? nextReview.dueDate : 'مكتمل ✅';
+                        const isOverdue = nextReview && nextReview.dueDate < new Date().toISOString().split('T')[0];
+                        const statusClass = isOverdue ? 'status-due' : (nextReview ? 'status-upcoming' : 'status-completed');
+
+                        html += `
+                            <div class="lesson-card">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                    <span style="font-weight: 700;">${lesson.name}</span>
+                                    <span class="card-badge ${statusClass}">${nextDate}</span>
+                                </div>
+                                <div style="font-size: 0.85em; color: #6b7280; margin-bottom: 8px;">${lesson.note || 'بدون ملاحظات'}</div>
+                                <div class="lesson-actions">
+                                    <button class="btn-delete" onclick="deleteLesson(${lesson.id})">حذف ❌</button>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `</div>`;
+                });
+            }
+
+            document.getElementById('lessons-container').innerHTML = html;
+        }
+
+        function deleteLesson(id) {
+            if (confirm('⚠️ هل تريد حذف هذا الدرس؟')) {
+                lessons = lessons.filter(l => l.id !== id);
+                reviews = reviews.filter(r => r.lessonId !== id);
+                saveLessons();
+                saveReviews();
+                renderLessonsPage();
+            }
+        }
+
+        function renderStatsPage() {
+            document.getElementById('total-lessons').textContent = lessons.length;
+
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const reviewsThisWeek = reviews.filter(r => 
+                new Date(r.completedAt || r.dueDate) >= weekAgo && r.completed
+            ).length;
+            document.getElementById('reviews-week').textContent = reviewsThisWeek;
+
+            const mastered = lessons.filter(l => l.level >= 4).length;
+            document.getElementById('mastered').textContent = mastered;
+            document.getElementById('streak').textContent = '0';
+        }
+
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            document.querySelector('.dark-toggle').textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+
+        function saveLessons() {
+            localStorage.setItem('lessons', JSON.stringify(lessons));
+        }
+
+        function saveReviews() {
+            localStorage.setItem('reviews', JSON.stringify(reviews));
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.querySelector('.dark-toggle').textContent = '☀️';
+            }
+            renderTodayPage();
+        });
+    </script>
+</body>
+</html>
